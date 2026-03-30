@@ -49,15 +49,15 @@ export function useResponsive() {
 		}
 
 		cardHeightVh = Math.max(42, Math.min(cardHeightVh, 72));
-		let containerHeightVh = 70;
+		let containerHeightVh = 82;
 		if (isPhone.value) {
-			containerHeightVh = isShortViewport.value ? 66 : 74;
+			containerHeightVh = isShortViewport.value ? 70 : 78;
 		} else if (isTablet.value) {
-			containerHeightVh = isShortViewport.value ? 64 : 72;
+			containerHeightVh = isShortViewport.value ? 72 : 80;
 		} else if (windowHeight.value <= 800) {
-			containerHeightVh = 58;
+			containerHeightVh = 74;
 		} else if (windowHeight.value <= 960) {
-			containerHeightVh = 64;
+			containerHeightVh = 78;
 		}
 
 		let bottomSafeSpace = 24;

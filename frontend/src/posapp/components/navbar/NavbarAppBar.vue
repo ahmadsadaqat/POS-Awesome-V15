@@ -22,7 +22,7 @@
 
 			<v-img
 				:src="posLogo"
-				alt="POS Awesome"
+				alt="NEXO POS"
 				:max-width="isMobile ? 24 : 32"
 				:class="['pos-navbar-logo', isRtl ? 'rtl-logo' : 'ltr-logo']"
 				loading="lazy"
@@ -41,11 +41,11 @@
 				role="button"
 			>
 				<template v-if="isMobile">
-					<span class="pos-navbar-title-compact">{{ __("POS") }}</span>
+					<span class="pos-navbar-title-compact">{{ __("NEXO POS") }}</span>
 				</template>
 				<template v-else>
-					<span class="font-weight-light pos-navbar-title-light">{{ __("POS") }}</span
-					><span class="pos-navbar-title-bold">{{ __("Awesome") }}</span>
+					<span class="font-weight-bold pos-navbar-title-bold">{{ __("NEXO") }}</span
+					><span class="pos-navbar-title-bold">{{ __("POS") }}</span>
 				</template>
 			</v-toolbar-title>
 		</div>
@@ -554,7 +554,7 @@ export default {
 	max-width: 100%;
 	flex: 1 1 auto;
 	/* Use same blue as Menu button - matching gradient blue */
-	color: #1976d2 !important;
+	color: #42818c !important;
 }
 
 .pos-navbar-title:hover {
@@ -614,7 +614,7 @@ export default {
 	transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 	min-width: 40px;
 	min-height: 40px;
-	color: #1976d2 !important;
+	color: #42818c !important;
 	background: rgba(25, 118, 210, 0.08) !important;
 	border: 1px solid rgba(25, 118, 210, 0.12);
 	backdrop-filter: blur(8px);
@@ -622,7 +622,7 @@ export default {
 
 .nav-icon:hover {
 	background: rgba(25, 118, 210, 0.12) !important;
-	color: #1565c0 !important;
+	color: #42818c !important;
 	border-color: rgba(25, 118, 210, 0.2);
 	transform: translateY(-1px);
 	box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
@@ -658,7 +658,7 @@ export default {
 }
 
 .profile-chip {
-	color: #1976d2 !important;
+	color: #42818c !important;
 	border-color: rgba(25, 118, 210, 0.2) !important;
 	background: rgba(25, 118, 210, 0.06) !important;
 	backdrop-filter: blur(8px);
@@ -764,19 +764,19 @@ export default {
 }
 
 .offline-invoices-btn .pos-text-primary {
-	color: #1976d2 !important;
+	color: #42818c !important;
 }
 
 /* Elite styling for navbar text and icons */
 .pos-navbar-enhanced .pos-text-primary {
-	color: #1976d2 !important;
+	color: #42818c !important;
 }
 
 /* Ensure profile text and icons use elite colors */
 .profile-chip .pos-text-primary,
 .profile-chip .ltr-profile-text,
 .profile-chip .rtl-profile-text {
-	color: #1976d2 !important;
+	color: #42818c !important;
 	font-weight: 500;
 }
 
@@ -784,12 +784,12 @@ export default {
 .pos-navbar-enhanced .v-icon.pos-text-primary,
 .pos-navbar-enhanced .mdi-menu-down,
 .pos-navbar-enhanced .v-icon--end.pos-text-primary {
-	color: #1976d2 !important;
+	color: #42818c !important;
 	transition: color 0.25s ease;
 }
 
 .pos-navbar-enhanced .v-icon.pos-text-primary:hover {
-	color: #1565c0 !important;
+	color: #42818c !important;
 }
 
 .rtl-offline-btn {
@@ -810,7 +810,7 @@ export default {
 }
 
 .offline-invoices-btn:hover .pos-text-primary {
-	color: #1565c0 !important;
+	color: #42818c !important;
 }
 
 .offline-invoices-btn.has-pending {

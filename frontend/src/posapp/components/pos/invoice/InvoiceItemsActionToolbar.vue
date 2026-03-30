@@ -1,6 +1,7 @@
 <template>
-	<div class="column-selector-container">
+	<div class="column-selector-container" :class="{ 'column-selector-container--compact': !showSearch }">
 		<v-text-field
+			v-if="showSearch"
 			ref="itemSearchField"
 			:model-value="itemSearch"
 			@update:model-value="$emit('update:itemSearch', $event)"
@@ -79,6 +80,10 @@
 import { ref } from "vue";
 
 const props = defineProps({
+	showSearch: {
+		type: Boolean,
+		default: true,
+	},
 	itemSearch: {
 		type: String,
 		default: "",
@@ -121,3 +126,17 @@ defineExpose({
 	focusSearch,
 });
 </script>
+
+<style scoped>
+.column-selector-container--compact {
+	justify-content: flex-end;
+	padding: 0;
+	margin-bottom: 0;
+	background: transparent;
+	border-radius: 0;
+}
+
+.column-selector-container--compact .column-selector-btn {
+	min-height: 34px;
+}
+</style>

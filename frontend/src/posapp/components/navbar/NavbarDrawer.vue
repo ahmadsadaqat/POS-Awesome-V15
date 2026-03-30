@@ -3,7 +3,7 @@
 		v-model="drawerOpen"
 		:rail="mini"
 		expand-on-hover
-		width="220"
+		width="80"
 		:class="['drawer-custom', { 'drawer-visible': drawerOpen }, rtlClasses]"
 		@mouseleave="handleMouseLeave"
 		temporary
@@ -157,12 +157,7 @@ function closeDrawer() {
 
 /* Styling for the company name text within the drawer header */
 .drawer-company {
-	margin-left: 12px;
-	flex: 1;
-	font-weight: 500;
-	font-size: 1rem;
-	color: #0097a7;
-	font-family: "Roboto", sans-serif;
+	display: none !important;
 }
 
 /* Styling for icons within the navigation drawer list items */
@@ -173,11 +168,7 @@ function closeDrawer() {
 
 /* Styling for the title text of navigation drawer list items */
 .drawer-item-title {
-	margin-left: 8px;
-	font-weight: 500;
-	font-size: 0.95rem;
-	color: var(--pos-text-primary) !important;
-	font-family: "Roboto", sans-serif;
+	display: none !important;
 }
 
 /* Hover effect for all list items in the navigation drawer */
@@ -252,19 +243,19 @@ function closeDrawer() {
 /* Responsive adjustments for width and dark theme */
 @media (max-width: 900px) and (orientation: landscape) {
 	.drawer-custom.drawer-visible {
-		width: 180px !important;
+		width: 70px !important;
 	}
 }
 
 @media (min-width: 601px) and (max-width: 1024px) {
 	.drawer-custom.drawer-visible {
-		width: 240px !important;
+		width: 70px !important;
 	}
 }
 
 @media (min-width: 1025px) {
 	.drawer-custom.drawer-visible {
-		width: 300px !important;
+		width: 70px !important;
 	}
 }
 

@@ -15,17 +15,6 @@
 					@update:model-value="$emit('update:modelValue', $event)"
 				></v-select>
 			</v-col>
-			<v-col cols="12" class="mb-2" v-if="posProfile.posa_enable_price_list_dropdown !== false">
-				<v-text-field
-					density="compact"
-					variant="solo"
-					color="primary"
-					:label="frappe._('Price List')"
-					hide-details
-					:model-value="activePriceList"
-					readonly
-				></v-text-field>
-			</v-col>
 			<v-col cols="12" sm="4" class="dynamic-margin-xs">
 				<v-btn-toggle
 					:model-value="itemsView"
@@ -88,13 +77,14 @@ defineEmits(["update:modelValue", "update:itemsView", "open-offers", "open-coupo
 
 <style scoped>
 .action-btn-consistent {
-	height: 36px !important;
+	height: 32px !important;
 	margin-top: var(--dynamic-xs) !important;
-	padding: var(--pos-space-2) var(--pos-space-3) !important;
+	padding: 4px 8px !important;
 	transition: var(--transition-normal) !important;
 	border-radius: var(--pos-radius-sm) !important;
 	text-transform: none !important;
 	font-weight: 600 !important;
+	font-size: 0.78rem !important;
 }
 
 .action-btn-consistent:hover {
@@ -103,23 +93,23 @@ defineEmits(["update:modelValue", "update:itemsView", "open-offers", "open-coupo
 }
 
 .view-toggle-btn {
-	height: 36px;
+	height: 32px;
 	border: 1px solid var(--pos-border-light);
 	border-radius: var(--pos-radius-sm);
 }
 
 .dynamic-padding {
-	padding: var(--dynamic-sm);
+	padding: var(--dynamic-xs);
 }
 
 .dynamic-spacing-sm {
-	padding: var(--dynamic-sm) !important;
+	padding: var(--dynamic-xs) !important;
 }
 
 .cards {
 	background-color: var(--pos-surface-muted) !important;
 	margin-top: var(--dynamic-sm) !important;
-	padding: var(--dynamic-sm) !important;
+	padding: var(--dynamic-xs) !important;
 	border: 1px solid var(--pos-border-light);
 	border-radius: var(--pos-radius-md) !important;
 	box-shadow: none !important;

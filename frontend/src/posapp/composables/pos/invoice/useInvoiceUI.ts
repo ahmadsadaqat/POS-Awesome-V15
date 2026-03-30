@@ -26,20 +26,20 @@ export function useInvoiceUI() {
 
 	const getMaxInvoiceHeightPx = () => {
 		const viewportHeight = getViewportHeight();
-		if (viewportHeight <= 800) return Math.round(viewportHeight * 0.58);
-		if (viewportHeight <= 960) return Math.round(viewportHeight * 0.64);
-		return Math.round(viewportHeight * 0.72);
+		if (viewportHeight <= 800) return Math.round(viewportHeight * 0.72);
+		if (viewportHeight <= 960) return Math.round(viewportHeight * 0.8);
+		return Math.round(viewportHeight * 0.86);
 	};
 
 	const getDefaultInvoiceHeight = () => {
-		if (typeof document === "undefined") {
-			return "68vh";
+		const viewportHeight = getViewportHeight();
+		if (viewportHeight <= 800) {
+			return `${Math.round(viewportHeight * 0.72)}px`;
 		}
-		return (
-			getComputedStyle(document.documentElement)
-				.getPropertyValue("--container-height")
-				.trim() || "68vh"
-		);
+		if (viewportHeight <= 960) {
+			return `${Math.round(viewportHeight * 0.8)}px`;
+		}
+		return `${Math.round(viewportHeight * 0.84)}px`;
 	};
 
 	const parseHeightToPx = (value: string | null | undefined) => {
@@ -56,11 +56,18 @@ export function useInvoiceUI() {
 	const clampInvoiceHeight = (
 		value: string | null | undefined,
 		fallback: string,
+		enforceFallbackMin = false,
 	) => {
 		const fallbackPx = parseHeightToPx(fallback) ?? getMaxInvoiceHeightPx();
-		const requestedPx = parseHeightToPx(value) ?? fallbackPx;
+		let requestedPx = parseHeightToPx(value) ?? fallbackPx;
+		if (enforceFallbackMin) {
+			requestedPx = Math.max(requestedPx, fallbackPx);
+		}
 		const maxPx = getMaxInvoiceHeightPx();
-		const minPx = Math.min(320, maxPx);
+		const minPx = Math.min(
+			Math.max(420, Math.round(fallbackPx * 0.75)),
+			maxPx,
+		);
 		const clamped = Math.max(minPx, Math.min(requestedPx, maxPx));
 		return `${Math.round(clamped)}px`;
 	};
@@ -69,12 +76,17 @@ export function useInvoiceUI() {
 		if (element) {
 			const defaultHeight = getDefaultInvoiceHeight();
 			if (!canResizeInvoicePanel()) {
-				invoiceHeight.value = clampInvoiceHeight(defaultHeight, defaultHeight);
+				invoiceHeight.value = clampInvoiceHeight(
+					defaultHeight,
+					defaultHeight,
+					true,
+				);
 				return;
 			}
 			invoiceHeight.value = clampInvoiceHeight(
 				`${element.clientHeight}px`,
 				defaultHeight,
+				true,
 			);
 			try {
 				localStorage.setItem(
@@ -91,18 +103,30 @@ export function useInvoiceUI() {
 		const defaultHeight = getDefaultInvoiceHeight();
 		try {
 			if (!canResizeInvoicePanel()) {
-				invoiceHeight.value = clampInvoiceHeight(defaultHeight, defaultHeight);
+				invoiceHeight.value = clampInvoiceHeight(
+					defaultHeight,
+					defaultHeight,
+					true,
+				);
 				return;
 			}
 			const saved = localStorage.getItem("posawesome_invoice_height");
 			invoiceHeight.value = clampInvoiceHeight(
 				saved || defaultHeight,
 				defaultHeight,
+				true,
 			);
-			localStorage.setItem("posawesome_invoice_height", invoiceHeight.value);
+			localStorage.setItem(
+				"posawesome_invoice_height",
+				invoiceHeight.value,
+			);
 		} catch (e) {
 			console.error("Failed to load invoice height:", e);
-			invoiceHeight.value = clampInvoiceHeight(defaultHeight, defaultHeight);
+			invoiceHeight.value = clampInvoiceHeight(
+				defaultHeight,
+				defaultHeight,
+				true,
+			);
 		}
 	};
 

@@ -504,9 +504,10 @@ export const useItemsStore = defineStore("items", () => {
 					cachedPagination.value.total = cachedResult.length;
 					cachedPagination.value.loading = false;
 					if (!searchValue && shouldPersistItems()) {
-						const storedCount = await getStoredItemsCountByScopeCompat(
-							getStorageScope(),
-						).catch(() => 0);
+						const storedCount =
+							await getStoredItemsCountByScopeCompat(
+								getStorageScope(),
+							).catch(() => 0);
 						if (!storedCount && cachedResult.length) {
 							await persistItemsToStorage(
 								cachedResult,
@@ -939,6 +940,8 @@ export const useItemsStore = defineStore("items", () => {
 			if (priceItem) {
 				const nextRate =
 					priceItem.price_list_rate || priceItem.rate || 0;
+				const nextMarketRate =
+					priceItem.market_rate ?? item.market_rate ?? 0;
 				const nextCurrency =
 					priceItem.currency ||
 					item.original_currency ||
@@ -947,6 +950,7 @@ export const useItemsStore = defineStore("items", () => {
 
 				item.rate = nextRate;
 				item.price_list_rate = nextRate;
+				item.market_rate = nextMarketRate;
 				item.original_rate = nextRate;
 				item.original_currency = nextCurrency;
 				item.currency = nextCurrency;
@@ -1029,7 +1033,9 @@ export const useItemsStore = defineStore("items", () => {
 		}
 	};
 
-	const refreshModifiedItems = async (priceListOverride: string | null = null) => {
+	const refreshModifiedItems = async (
+		priceListOverride: string | null = null,
+	) => {
 		if (!itemsLoaded.value) return { size: 0, count: 0, items: [] };
 		const resolvedPriceList =
 			typeof priceListOverride === "string" &&
@@ -1086,10 +1092,7 @@ export const useItemsStore = defineStore("items", () => {
 				) {
 					(update as any).original_rate = syncedRate;
 				}
-				if (
-					update.currency &&
-					update.original_currency === undefined
-				) {
+				if (update.currency && update.original_currency === undefined) {
 					(update as any).original_currency = update.currency;
 				}
 				additions.push(update);

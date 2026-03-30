@@ -73,6 +73,12 @@ export function useInvoiceItems(invoiceType: Ref<string>) {
 			required: false,
 		},
 		{ title: __("Rate"), key: "rate", align: "center", required: true },
+		{
+			title: __("Market Rate"),
+			key: "market_rate",
+			align: "center",
+			required: true,
+		},
 		{ title: __("Amount"), key: "amount", align: "center", required: true },
 		{
 			title: __("Offer?"),
@@ -117,6 +123,7 @@ export function useInvoiceItems(invoiceType: Ref<string>) {
 							pos_profile.value?.posa_display_discount_amount
 						)
 							return true;
+						if (col.key === "market_rate") return true;
 						return false;
 					})
 					.map((col) => col.key);
@@ -217,7 +224,10 @@ export function useInvoiceItems(invoiceType: Ref<string>) {
 				0,
 				Number(item._offer_constraints.max_qty || 0),
 			);
-			if (maxOfferQty > 0 && Math.abs(Number(parsedValue || 0)) > maxOfferQty) {
+			if (
+				maxOfferQty > 0 &&
+				Math.abs(Number(parsedValue || 0)) > maxOfferQty
+			) {
 				const limitedQty = parsedValue < 0 ? -maxOfferQty : maxOfferQty;
 				item[field_name] = limitedQty;
 				parsedValue = limitedQty;

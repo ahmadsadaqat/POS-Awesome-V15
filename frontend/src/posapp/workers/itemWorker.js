@@ -242,6 +242,7 @@ async function bulkPutPrices(priceList, items, syncedAt = Date.now()) {
 				item_code: it.item_code,
 				rate: price,
 				price_list_rate: price,
+				market_rate: it.market_rate ?? 0,
 				timestamp: syncedAt,
 			};
 		});
@@ -283,6 +284,7 @@ self.onmessage = async (event) => {
 				item_group: it.item_group,
 				rate: it.rate,
 				price_list_rate: it.price_list_rate,
+				market_rate: it.market_rate,
 				currency: it.currency,
 				item_barcode: it.item_barcode,
 				item_uoms: it.item_uoms,

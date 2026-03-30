@@ -16,10 +16,8 @@
 					variant="tonal"
 					class="summary-field summary-field--alert"
 				>
-					{{ __("Prorated return discount") }}:
-					{{ formatRatio(return_discount_meta.ratio) }} -
-					{{ __("Original") }}:
-					{{ formatCurrency(return_discount_meta.original_discount) }},
+					{{ __("Prorated return discount") }}: {{ formatRatio(return_discount_meta.ratio) }} -
+					{{ __("Original") }}: {{ formatCurrency(return_discount_meta.original_discount) }},
 					{{ __("Applied") }}:
 					{{ formatCurrency(return_discount_meta.prorated_discount) }}
 				</v-alert>
@@ -31,9 +29,13 @@
 							{{ currencySymbol(displayCurrency) }}{{ formatCurrency(subtotal) }}
 						</strong>
 						<div class="summary-hero__meta">
-							<span>{{ formatFloat(total_qty, hide_qty_decimals ? 0 : undefined) }} {{ __("qty") }}</span>
+							<span
+								>{{ formatFloat(total_qty, hide_qty_decimals ? 0 : undefined) }}
+								{{ __("qty") }}</span
+							>
 							<span>
-								{{ currencySymbol(displayCurrency) }}{{ formatCurrency(total_items_discount_amount) }}
+								{{ currencySymbol(displayCurrency)
+								}}{{ formatCurrency(total_items_discount_amount) }}
 								{{ __("discount") }}
 							</span>
 						</div>
@@ -344,10 +346,9 @@ defineExpose({
 }
 
 .sticky-summary-card {
-	position: sticky;
-	bottom: 0;
+	position: static;
 	z-index: 9;
-	box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.08);
+	box-shadow: none;
 }
 
 .sticky-summary-card--dock-safe {
@@ -355,15 +356,15 @@ defineExpose({
 }
 
 .summary-content {
-	row-gap: 6px;
+	row-gap: 4px;
 }
 
 .summary-hero {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 14px;
-	padding: 14px 16px;
+	gap: 10px;
+	padding: 10px 12px;
 	border-radius: 20px;
 	background:
 		linear-gradient(135deg, rgba(var(--v-theme-primary), 0.12), rgba(var(--v-theme-success), 0.08)),
@@ -387,7 +388,7 @@ defineExpose({
 }
 
 .summary-hero__amount {
-	font-size: clamp(1.2rem, 2vw, 1.8rem);
+	font-size: clamp(1rem, 1.55vw, 1.35rem);
 	line-height: 1.1;
 	color: var(--pos-text-primary);
 }
@@ -395,8 +396,8 @@ defineExpose({
 .summary-hero__meta {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 8px 14px;
-	font-size: 0.84rem;
+	gap: 6px 10px;
+	font-size: 0.78rem;
 	color: var(--pos-text-secondary);
 }
 
@@ -405,8 +406,7 @@ defineExpose({
 }
 
 .invoice-summary-actions {
-	position: sticky;
-	bottom: 0;
+	position: static;
 }
 
 .summary-field {
@@ -466,7 +466,7 @@ defineExpose({
 	}
 
 	.cards {
-		padding: 10px 12px !important;
+		padding: 8px 10px !important;
 	}
 
 	.summary-field {

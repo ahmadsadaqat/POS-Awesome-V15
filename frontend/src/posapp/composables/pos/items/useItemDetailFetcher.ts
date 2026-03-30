@@ -266,6 +266,9 @@ export function useItemDetailFetcher() {
 						upd.currency = det.currency;
 						upd.original_currency = det.currency;
 					}
+					if (det.market_rate !== undefined) {
+						upd.market_rate = det.market_rate;
+					}
 					updates.push({ item, upd });
 				}
 			});
@@ -305,6 +308,9 @@ export function useItemDetailFetcher() {
 					if (updItem.currency) {
 						upd.currency = updItem.currency;
 						upd.original_currency = updItem.currency;
+					}
+					if (updItem.market_rate !== undefined) {
+						upd.market_rate = updItem.market_rate;
 					}
 					if (updItem.batch_no_data) {
 						upd.batch_no_data = updItem.batch_no_data;
@@ -409,6 +415,9 @@ export function useItemDetailFetcher() {
 				if (det.currency) {
 					item.currency = det.currency;
 					item.original_currency = det.currency;
+				}
+				if (det.market_rate !== undefined) {
+					item.market_rate = det.market_rate;
 				}
 
 				if (ctx.itemAvailability) {
@@ -561,6 +570,10 @@ export function useItemDetailFetcher() {
 									updated_item.currency ||
 									item.original_currency ||
 									item.currency,
+								market_rate:
+									updated_item.market_rate !== undefined
+										? updated_item.market_rate
+										: item.market_rate,
 							},
 						});
 

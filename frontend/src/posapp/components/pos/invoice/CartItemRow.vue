@@ -307,6 +307,16 @@
 			</div>
 		</td>
 
+		<!-- Market Rate (Optional) -->
+		<td v-if="showMarketRate" class="text-center" :data-column-key="'market_rate'">
+			<div class="currency-display right-aligned">
+				<span class="currency-symbol">{{ currencySymbol(displayCurrency) }}</span>
+				<span class="amount-value" :class="{ 'negative-number': isNegative(item.market_rate) }">
+					{{ formatCurrency(item.market_rate ?? 0) }}
+				</span>
+			</div>
+		</td>
+
 		<!-- Amount Column -->
 		<td class="text-center" :data-column-key="'amount'">
 			<div class="currency-display right-aligned">
@@ -377,6 +387,7 @@ const props = defineProps({
 	showPriceListRate: Boolean,
 	showDiscountPercent: Boolean,
 	showDiscountAmount: Boolean,
+	showMarketRate: Boolean,
 	showOffer: Boolean,
 });
 
@@ -427,6 +438,7 @@ const memoDeps = computed(() => {
 		props.item.posa_offer_applied,
 		props.item.is_free_item,
 		props.item.price_list_rate,
+		props.item.market_rate,
 		// Include edit states to ensure UI updates when switching modes
 		isEditingQty.value,
 		isEditingRate.value,
@@ -438,6 +450,7 @@ const memoDeps = computed(() => {
 		uom: props.item.uom,
 		rate: props.item.rate,
 		price_list_rate: props.item.price_list_rate,
+		market_rate: props.item.market_rate,
 		qty: props.item.qty,
 	});
 	return deps;

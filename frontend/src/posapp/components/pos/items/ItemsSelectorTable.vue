@@ -85,6 +85,28 @@
 					}}
 				</div>
 			</template>
+			<template v-slot:item.market_rate="{ item }">
+				<div class="text-primary">
+					{{
+						currencySymbol(
+							item.original_currency ||
+								item.currency ||
+								item.price_list_currency ||
+								posProfile.currency,
+						)
+					}}
+					{{
+						formatCurrency(
+							item.market_rate ?? 0,
+							item.original_currency ||
+								item.currency ||
+								item.price_list_currency ||
+								posProfile.currency,
+							ratePrecision(item.market_rate ?? 0),
+						)
+					}}
+				</div>
+			</template>
 			<template v-slot:item.actual_qty="{ item }">
 				<span class="golden--text" :class="{ 'negative-number': isNegative(item.actual_qty) }">
 					{{ formatActualQty(item.actual_qty) }}

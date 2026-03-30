@@ -10,7 +10,7 @@
 				class="summary-btn"
 				:loading="saveLoading"
 			>
-				{{ __("Save & Clear") }}
+				{{ __("Hold") }}
 			</v-btn>
 		</v-col>
 		<v-col cols="12" sm="6">
@@ -175,13 +175,16 @@ const showCustomerDisplayButton = computed(() =>
 	transition: all 0.2s ease !important;
 	position: relative;
 	overflow: hidden;
-	min-height: 46px !important;
+	min-height: 36px !important;
+	padding: 0 8px !important;
 	text-transform: none !important;
+	font-size: 0.8rem !important;
 }
 
 .summary-btn :deep(.v-btn__content) {
 	white-space: normal !important;
 	transition: all 0.2s ease;
+	gap: 4px;
 }
 
 .summary-btn:hover {
@@ -196,7 +199,7 @@ const showCustomerDisplayButton = computed(() =>
 /* Special styling for the PAY button */
 .pay-btn {
 	font-weight: 600 !important;
-	font-size: 1.1rem !important;
+	font-size: 0.96rem !important;
 	background: linear-gradient(135deg, #4caf50, #45a049) !important;
 	box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3) !important;
 }
@@ -210,27 +213,27 @@ const showCustomerDisplayButton = computed(() =>
 /* Responsive optimizations */
 @media (max-width: 768px) {
 	.summary-btn {
-		font-size: 0.8rem !important;
+		font-size: 0.74rem !important;
 		padding: 4px 8px !important;
-		min-height: 42px !important;
+		min-height: 34px !important;
 	}
 
 	.pay-btn {
-		font-size: 0.95rem !important;
-		min-height: 48px !important;
+		font-size: 0.86rem !important;
+		min-height: 38px !important;
 	}
 }
 
 @media (max-width: 480px) {
 	.summary-btn {
-		font-size: 0.74rem !important;
+		font-size: 0.7rem !important;
 		padding: 3px 6px !important;
-		min-height: 34px !important;
+		min-height: 30px !important;
 	}
 
 	.pay-btn {
-		font-size: 0.85rem !important;
-		min-height: 40px !important;
+		font-size: 0.8rem !important;
+		min-height: 34px !important;
 	}
 }
 

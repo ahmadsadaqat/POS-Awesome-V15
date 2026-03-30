@@ -37,6 +37,7 @@ export function useItemsTableResponsive(
 			item_name: { min: 200, max: 250, ratio: 0.3 },
 			qty: { min: 140, max: 160, ratio: 0.12 },
 			rate: { min: 100, max: 130, ratio: 0.12 },
+			market_rate: { min: 100, max: 130, ratio: 0.12 },
 			amount: { min: 100, max: 130, ratio: 0.12 },
 			discount_value: { min: 90, max: 120, ratio: 0.1 },
 			discount_amount: { min: 90, max: 120, ratio: 0.11 },
@@ -59,6 +60,7 @@ export function useItemsTableResponsive(
 			item_name: 200,
 			qty: 140,
 			rate: 100,
+			market_rate: 100,
 			amount: 100,
 			discount_value: 90,
 			discount_amount: 90,
@@ -94,6 +96,7 @@ export function useItemsTableResponsive(
 						"discount_value",
 						"discount_amount",
 						"price_list_rate",
+						"market_rate",
 						"uom",
 						"posa_is_offer",
 					].includes(header.key);

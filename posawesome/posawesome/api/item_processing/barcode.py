@@ -426,18 +426,23 @@ def get_items_from_barcode(selling_price_list, currency, barcode):
         item_uom = getattr(item_doc, "stock_uom", None)
 
     rate = None
+    market_rate = None
     if scale_price is not None:
         rate = flt(scale_price)
     else:
-        rate = frappe.db.get_value(
+        price_data = frappe.db.get_value(
             "Item Price",
             {
                 "item_code": item_code,
                 "price_list": selling_price_list,
                 "currency": currency,
             },
-            "price_list_rate",
+            ["price_list_rate", "market_rate"],
+            as_dict=True,
         )
+        if price_data:
+            rate = price_data.get("price_list_rate")
+            market_rate = price_data.get("market_rate")
 
     return {
         "item_code": item_doc.name,
@@ -445,6 +450,7 @@ def get_items_from_barcode(selling_price_list, currency, barcode):
         "barcode": barcode,
         "rate": rate or 0,
         "price_list_rate": rate or 0,
+        "market_rate": market_rate or 0,
         "uom": item_uom or item_doc.stock_uom,
         "currency": currency,
         "scale_qty": scale_qty,

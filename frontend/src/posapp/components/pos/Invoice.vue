@@ -8,8 +8,8 @@
 		<v-card
 			ref="invoiceCard"
 			:style="{
-				height: invoiceHeight || 'var(--container-height)',
-				maxHeight: invoiceHeight || 'var(--container-height)',
+				height: invoiceHeight || 'var(--invoice-panel-height, var(--container-height))',
+				maxHeight: invoiceHeight || 'var(--invoice-panel-height, var(--container-height))',
 				resize: canResizeInvoicePanel() ? 'vertical' : 'none',
 				overflow: 'auto',
 			}"
@@ -32,8 +32,8 @@
 					{{ __("Invoices saved as POS Invoices") }}
 				</v-alert>
 				<div class="invoice-sections">
-					<div class="invoice-top-grid">
-						<v-card flat class="invoice-section-card pos-themed-card">
+					<div class="invoice-control-grid">
+						<v-card flat class="invoice-section-card invoice-customer-card pos-themed-card">
 							<div class="invoice-section-heading">
 								<h3 class="invoice-section-heading__title">{{ __("Customer Details") }}</h3>
 							</div>
@@ -45,6 +45,42 @@
 							/>
 						</v-card>
 
+						<v-card flat class="invoice-section-card invoice-search-card pos-themed-card">
+							<div class="invoice-section-heading">
+								<h3 class="invoice-section-heading__title">{{ __("Invoice Items") }}</h3>
+							</div>
+							<div class="invoice-inline-search">
+								<v-text-field
+									v-model="itemSearch"
+									density="compact"
+									variant="solo"
+									color="primary"
+									class="item-search-field pos-themed-input"
+									:label="__('Search items or barcode')"
+									prepend-inner-icon="mdi-magnify"
+									hide-details
+									clearable
+									autocomplete="off"
+								></v-text-field>
+								<InvoiceItemsActionToolbar
+									ref="actionToolbar"
+									:itemSearch="itemSearch"
+									:showSearch="false"
+									:availableColumns="available_columns"
+									:selectedColumns="selected_columns"
+									@update:itemSearch="itemSearch = $event"
+									@update:selectedColumns="
+										(cols) => {
+											selected_columns = cols;
+											saveColumnPreferences();
+										}
+									"
+								/>
+							</div>
+						</v-card>
+					</div>
+
+					<div class="invoice-meta-grid">
 						<v-card
 							v-if="pos_profile.posa_use_delivery_charges"
 							flat
@@ -71,16 +107,16 @@
 								"
 							/>
 						</v-card>
-					</div>
 
-					<div class="invoice-meta-grid">
 						<v-card
 							v-if="pos_profile.posa_allow_change_posting_date"
 							flat
 							class="invoice-section-card pos-themed-card"
 						>
 							<div class="invoice-section-heading">
-								<h3 class="invoice-section-heading__title">{{ __("Posting and Price List") }}</h3>
+								<h3 class="invoice-section-heading__title">
+									{{ __("Posting and Price List") }}
+								</h3>
 							</div>
 							<PostingDateRow
 								ref="postingDateComponent"
@@ -146,20 +182,6 @@
 							<h3 class="invoice-section-heading__title">{{ __("Invoice Items") }}</h3>
 						</div>
 						<div class="items-table-wrapper">
-							<InvoiceItemsActionToolbar
-								ref="actionToolbar"
-								:itemSearch="itemSearch"
-								:availableColumns="available_columns"
-								:selectedColumns="selected_columns"
-								@update:itemSearch="itemSearch = $event"
-								@update:selectedColumns="
-									(cols) => {
-										selected_columns = cols;
-										saveColumnPreferences();
-									}
-								"
-							/>
-
 							<ItemsTable
 								ref="itemsTableRef"
 								:headers="items_headers"
@@ -190,7 +212,9 @@
 								@update:expanded="handleExpandedUpdate"
 								@reorder-items="handleItemReorder"
 								@add-item-from-drag="handleItemDrop"
-								@show-drop-feedback="(isDragging) => showDropFeedback(isDragging, itemsTableRef)"
+								@show-drop-feedback="
+									(isDragging) => showDropFeedback(isDragging, itemsTableRef)
+								"
 								@item-dropped="showDropFeedback(false, itemsTableRef)"
 								@view-packed="openPackedItems"
 							/>
@@ -226,34 +250,36 @@
 		/>
 
 		<!-- Payment Section -->
-		<InvoiceSummary
-			ref="invoiceSummary"
-			:pos_profile="pos_profile"
-			:total_qty="total_qty"
-			:additional_discount="additional_discount"
-			:additional_discount_percentage="additional_discount_percentage"
-			:total_items_discount_amount="total_items_discount_amount"
-			:subtotal="subtotal"
-			:displayCurrency="displayCurrency"
-			:formatFloat="formatFloat"
-			:formatCurrency="formatCurrency"
-			:currencySymbol="currencySymbol"
-			:discount_percentage_offer_name="discount_percentage_offer_name"
-			:isNumber="isNumber"
-			:return_discount_meta="return_discount_meta"
-			@update:additional_discount="(val) => (additional_discount = val)"
-			@update:additional_discount_percentage="(val) => (additional_discount_percentage = val)"
-			@update_discount_umount="update_discount_umount"
-			@save-and-clear="save_and_clear_invoice"
-			@load-drafts="get_draft_invoices"
-			@select-order="get_draft_orders"
-			@cancel-sale="cancel_dialog = true"
-			@open-invoice-management="open_invoice_management"
-			@open-returns="open_returns"
-			@print-draft="print_draft_invoice"
-			@show-payment="handleShowPaymentRequest"
-			@open-customer-display="handleOpenCustomerDisplayRequest"
-		/>
+		<div class="invoice-summary-slot">
+			<InvoiceSummary
+				ref="invoiceSummary"
+				:pos_profile="pos_profile"
+				:total_qty="total_qty"
+				:additional_discount="additional_discount"
+				:additional_discount_percentage="additional_discount_percentage"
+				:total_items_discount_amount="total_items_discount_amount"
+				:subtotal="subtotal"
+				:displayCurrency="displayCurrency"
+				:formatFloat="formatFloat"
+				:formatCurrency="formatCurrency"
+				:currencySymbol="currencySymbol"
+				:discount_percentage_offer_name="discount_percentage_offer_name"
+				:isNumber="isNumber"
+				:return_discount_meta="return_discount_meta"
+				@update:additional_discount="(val) => (additional_discount = val)"
+				@update:additional_discount_percentage="(val) => (additional_discount_percentage = val)"
+				@update_discount_umount="update_discount_umount"
+				@save-and-clear="save_and_clear_invoice"
+				@load-drafts="get_draft_invoices"
+				@select-order="get_draft_orders"
+				@cancel-sale="cancel_dialog = true"
+				@open-invoice-management="open_invoice_management"
+				@open-returns="open_returns"
+				@print-draft="print_draft_invoice"
+				@show-payment="handleShowPaymentRequest"
+				@open-customer-display="handleOpenCustomerDisplayRequest"
+			/>
+		</div>
 	</div>
 </template>
 
@@ -467,22 +493,14 @@ export default {
 			},
 		},
 		return_discount_meta() {
-			if (
-				!this.isReturnInvoice ||
-				!this.return_doc ||
-				this.pos_profile?.posa_use_percentage_discount
-			) {
+			if (!this.isReturnInvoice || !this.return_doc || this.pos_profile?.posa_use_percentage_discount) {
 				return null;
 			}
 
-			const originalDiscount = Math.abs(
-				Number(this.return_discount_base_amount || 0),
-			);
+			const originalDiscount = Math.abs(Number(this.return_discount_base_amount || 0));
 			if (!originalDiscount) return null;
 
-			const originalTotal = Math.abs(
-				Number(this.return_discount_base_total || 0),
-			);
+			const originalTotal = Math.abs(Number(this.return_discount_base_total || 0));
 			if (!originalTotal) return null;
 
 			const returnTotal = Math.abs(Number(this.Total || 0));
@@ -573,12 +591,8 @@ export default {
 				return;
 			}
 
-			const originalDiscount = Math.abs(
-				Number(this.return_discount_base_amount || 0),
-			);
-			const originalTotal = Math.abs(
-				Number(this.return_discount_base_total || 0),
-			);
+			const originalDiscount = Math.abs(Number(this.return_discount_base_amount || 0));
+			const originalTotal = Math.abs(Number(this.return_discount_base_total || 0));
 			const returnTotal = Math.abs(Number(this.Total || 0));
 
 			if (!originalDiscount || !originalTotal || !returnTotal) {
@@ -736,18 +750,11 @@ export default {
 		calcProratedReturnDiscount(returnDoc) {
 			if (!returnDoc) return 0;
 
-			const originalDiscount = Math.abs(
-				Number(returnDoc.discount_amount || 0),
-			);
+			const originalDiscount = Math.abs(Number(returnDoc.discount_amount || 0));
 			if (!originalDiscount) return 0;
 
 			const originalTotal = Math.abs(
-				Number(
-					returnDoc.total ??
-						returnDoc.net_total ??
-						returnDoc.grand_total ??
-						0,
-				),
+				Number(returnDoc.total ?? returnDoc.net_total ?? returnDoc.grand_total ?? 0),
 			);
 			if (!originalTotal) return 0;
 
@@ -789,9 +796,7 @@ export default {
 			if (data.return_doc) {
 				this.return_doc = data.return_doc;
 				this.invoice_doc.return_against = data.return_doc.name;
-				this.return_discount_base_amount = Math.abs(
-					Number(data.return_doc.discount_amount || 0),
-				);
+				this.return_discount_base_amount = Math.abs(Number(data.return_doc.discount_amount || 0));
 				this.return_discount_base_total = Math.abs(
 					Number(
 						data.return_doc.total ??
@@ -802,32 +807,23 @@ export default {
 				);
 				console.log("[POSA][Returns] Loaded return doc", {
 					return_against: data.return_doc.name,
-					is_percentage:
-						!!this.pos_profile?.posa_use_percentage_discount,
+					is_percentage: !!this.pos_profile?.posa_use_percentage_discount,
 					discount_amount: data.return_doc.discount_amount,
-					discount_percentage:
-						data.return_doc.additional_discount_percentage,
+					discount_percentage: data.return_doc.additional_discount_percentage,
 					original_total:
-						data.return_doc.total ??
-						data.return_doc.net_total ??
-						data.return_doc.grand_total,
+						data.return_doc.total ?? data.return_doc.net_total ?? data.return_doc.grand_total,
 					base_total: this.return_discount_base_total,
 					base_discount: this.return_discount_base_amount,
 				});
 
 				if (this.pos_profile?.posa_use_percentage_discount) {
-					if (
-						data.return_doc.additional_discount_percentage !==
-						undefined
-					) {
+					if (data.return_doc.additional_discount_percentage !== undefined) {
 						this.additional_discount_percentage =
 							data.return_doc.additional_discount_percentage || 0;
 					}
 					this.update_discount_umount();
 				} else {
-					const prorated = this.calcProratedReturnDiscount(
-						data.return_doc,
-					);
+					const prorated = this.calcProratedReturnDiscount(data.return_doc);
 					this.discount_amount = prorated;
 					this.additional_discount = prorated;
 					this.additional_discount_percentage = 0;
@@ -854,11 +850,8 @@ export default {
 				this.price_list_rate_dialog_resolver(null);
 			}
 
-			this.price_list_rate_dialog_initial_rate =
-				initialRate == null ? "" : String(initialRate);
-			this.price_list_rate_dialog_item_label = String(
-				item?.item_name || item?.item_code || "",
-			);
+			this.price_list_rate_dialog_initial_rate = initialRate == null ? "" : String(initialRate);
+			this.price_list_rate_dialog_item_label = String(item?.item_name || item?.item_code || "");
 			this.price_list_rate_dialog_open = true;
 
 			return new Promise((resolve) => {
@@ -964,8 +957,7 @@ export default {
 			load_return_invoice: this.handleLoadReturnInvoice,
 			set_new_line: this.handleSetNewLine,
 			calc_uom: this.calc_uom,
-			recalculate_return_discount: (payload) =>
-				this.applyReturnDiscountProration(payload),
+			recalculate_return_discount: (payload) => this.applyReturnDiscountProration(payload),
 			reset_invoice_type_to_invoice: () => {
 				this.invoiceType = "Invoice";
 				this.invoiceTypes = ["Invoice", "Order", "Quotation"];
@@ -1034,20 +1026,14 @@ export default {
 		this._shortcutHandlers.handleInvoiceShortcut = createInvoiceShortcutListeners(
 			this.handleInvoiceShortcut.bind(this),
 		);
-		registerInvoiceShortcutListener(
-			document,
-			this._shortcutHandlers.handleInvoiceShortcut,
-		);
+		registerInvoiceShortcutListener(document, this._shortcutHandlers.handleInvoiceShortcut);
 	},
 	unmounted() {
 		if (!this._shortcutHandlers) {
 			return;
 		}
 
-		unregisterInvoiceShortcutListener(
-			document,
-			this._shortcutHandlers.handleInvoiceShortcut,
-		);
+		unregisterInvoiceShortcutListener(document, this._shortcutHandlers.handleInvoiceShortcut);
 
 		this._shortcutHandlers = {};
 	},
@@ -1073,16 +1059,19 @@ export default {
 }
 
 .invoice-shell {
+	--invoice-panel-height: calc(var(--container-height) + 140px);
 	display: flex;
 	flex-direction: column;
 	gap: var(--dynamic-sm);
 	flex: 1 1 auto;
+	height: 100%;
 	min-height: 0;
-	overflow: auto;
+	overflow: hidden;
 }
 
 @media (max-width: 1099px) {
 	.invoice-shell {
+		--invoice-panel-height: var(--container-height);
 		padding-bottom: calc(var(--bottom-safe-space) + var(--dynamic-xs));
 	}
 }
@@ -1090,9 +1079,10 @@ export default {
 .invoice-main-card {
 	display: flex;
 	flex-direction: column;
-	flex: 0 0 auto;
-	overflow: auto !important;
+	flex: 1 1 auto;
+	overflow: hidden !important;
 	min-width: 0;
+	min-height: 0;
 }
 
 /* Style for selected checkbox button */
@@ -1168,25 +1158,48 @@ export default {
 }
 
 .invoice-sections {
-	display: flex;
-	flex-direction: column;
+	display: grid;
+	grid-template-rows: auto auto 1fr;
 	gap: var(--dynamic-sm);
 	flex: 1 1 auto;
 	min-height: 0;
-	overflow: visible;
+	overflow: hidden;
 	align-items: stretch;
 }
 
-.invoice-top-grid {
+.invoice-control-grid {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: var(--dynamic-sm);
 	flex: 0 0 auto;
 }
 
+.invoice-search-card {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.invoice-inline-search {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px 12px;
+}
+
+.invoice-inline-search :deep(.item-search-field) {
+	max-width: none;
+	margin-right: 0;
+}
+
+.invoice-customer-card :deep(.items) {
+	padding: 8px 12px;
+}
+
 .invoice-meta-grid {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 	gap: var(--dynamic-sm);
 	flex: 0 0 auto;
 }
@@ -1217,9 +1230,9 @@ export default {
 	padding-bottom: var(--dynamic-xs);
 	display: flex;
 	flex-direction: column;
-	flex: 0 0 auto;
-	min-height: 320px;
-	overflow: visible;
+	flex: 1 1 auto;
+	min-height: 540px;
+	overflow: hidden;
 }
 
 /* Responsive breakpoints */
@@ -1253,12 +1266,12 @@ export default {
 		grid-template-columns: 1fr;
 	}
 
-	.invoice-top-grid {
+	.invoice-control-grid {
 		grid-template-columns: 1fr;
 	}
 
 	.invoice-sections {
-		overflow: visible;
+		overflow: hidden;
 	}
 
 	.invoice-items-card {
@@ -1301,7 +1314,7 @@ export default {
 		grid-template-columns: 1fr;
 	}
 
-	.invoice-top-grid {
+	.invoice-control-grid {
 		grid-template-columns: 1fr;
 	}
 
@@ -1347,15 +1360,16 @@ export default {
 
 .items-table-wrapper {
 	position: relative;
-	margin-top: var(--dynamic-sm);
+	margin-top: var(--dynamic-xs);
 	width: 100%;
 	max-width: 100%;
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
-	flex: 0 0 auto;
-	min-height: 320px;
+	flex: 1 1 auto;
+	min-height: 500px;
 	min-width: 0;
+	overflow: hidden;
 }
 
 :deep(.items-table-wrapper .column-selector-container) {
@@ -1366,18 +1380,34 @@ export default {
 }
 
 :deep(.items-table-wrapper .posa-items-table-container) {
-	flex: 0 0 auto;
-	min-height: 320px;
-	height: auto !important;
+	flex: 1 1 auto;
+	min-height: 460px;
+	height: 100% !important;
 	max-height: none !important;
-	overflow: visible !important;
+	overflow: auto !important;
 }
 
 :deep(.items-table-wrapper .posa-cart-table),
 :deep(.items-table-wrapper .v-data-table__wrapper),
 :deep(.items-table-wrapper .v-table__wrapper) {
-	height: auto !important;
+	height: 100% !important;
 	max-height: none !important;
+}
+
+.invoice-summary-slot {
+	margin-top: auto;
+	flex: 0 0 auto;
+	position: sticky;
+	bottom: 0;
+	z-index: 12;
+	background: var(--pos-surface-muted);
+}
+
+@media (max-width: 1099px) {
+	.invoice-summary-slot {
+		position: static;
+		bottom: auto;
+	}
 }
 
 /* New styles for improved column switches */
