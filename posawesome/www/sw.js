@@ -13,6 +13,12 @@ const PRECACHE_URLS = [
 	"/offline.html",
 ];
 
+const NON_CACHEABLE_PATHS = new Set(["/assets/posawesome/dist/js/posawesome.js"]);
+
+function shouldBypassCache(url) {
+	return NON_CACHEABLE_PATHS.has(url.pathname);
+}
+
 let cachedCacheName = null;
 let cacheNameInFlight = null;
 let currentVersion = null;
@@ -194,8 +200,14 @@ self.addEventListener("fetch", (event) => {
 	const isAssetRequest = assetDestinations.includes(event.request.destination);
 	const isPosawesomeAsset = url.pathname.startsWith("/assets/posawesome/");
 	const isNavigation = event.request.mode === "navigate";
+	const bypassCache = shouldBypassCache(url);
 
 	if (!isNavigation && !isAssetRequest && !isPosawesomeAsset) {
+		return;
+	}
+
+	if (bypassCache) {
+		event.respondWith(fetch(event.request, { cache: "no-store" }).catch(() => Response.error()));
 		return;
 	}
 
