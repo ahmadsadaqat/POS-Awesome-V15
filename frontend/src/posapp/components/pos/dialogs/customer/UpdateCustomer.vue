@@ -134,13 +134,12 @@
 									density="compact"
 									auto-select-first
 									color="primary"
-									:label="frappe._('Customer Group') + ' *'"
+									:label="frappe._('Customer Group')"
 									v-model="group"
 									:items="groups"
 									class="pos-themed-input"
 									:no-data-text="__('Group not found')"
 									hide-details
-									required
 								>
 								</v-autocomplete>
 							</v-col>
@@ -150,13 +149,12 @@
 									density="compact"
 									auto-select-first
 									color="primary"
-									:label="frappe._('Territory') + ' *'"
+									:label="frappe._('Territory')"
 									v-model="territory"
 									:items="territorys"
 									class="pos-themed-input"
 									:no-data-text="__('Territory not found')"
 									hide-details
-									required
 								>
 								</v-autocomplete>
 							</v-col>
@@ -518,16 +516,6 @@ export default {
 			const vm = this;
 			if (!this.customer_name) {
 				frappe.throw(__("Customer Name is required"));
-				return;
-			}
-
-			if (!this.group) {
-				frappe.throw(__("Customer group is required"));
-				return;
-			}
-
-			if (!this.territory) {
-				frappe.throw(__("Customer territory is required"));
 				return;
 			}
 
