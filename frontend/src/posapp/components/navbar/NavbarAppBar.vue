@@ -59,34 +59,13 @@
 				<!-- Always visible status indicator -->
 				<slot name="status-indicator"></slot>
 
-				<!-- Offline Invoices with higher priority on mobile -->
 				<div
 					:class="[
 						'primary-actions-cluster mobile-primary-actions',
 						isRtl ? 'rtl-primary-actions' : 'ltr-primary-actions',
 					]"
 				>
-					<v-btn
-						icon
-						size="small"
-						:class="[
-							'offline-invoices-btn mobile-btn pos-themed-button',
-							isRtl ? 'rtl-offline-btn' : 'ltr-offline-btn',
-							{ 'has-pending': pendingInvoices > 0 },
-						]"
-						:aria-label="__('View offline invoices') + ` (${pendingInvoices})`"
-						@click="$emit('show-offline-invoices')"
-					>
-						<v-badge v-if="pendingInvoices > 0" :content="pendingInvoices" color="error" floating>
-							<v-icon class="pos-text-primary">mdi-file-document-multiple-outline</v-icon>
-						</v-badge>
-						<v-icon v-else class="pos-text-primary">mdi-file-document-multiple-outline</v-icon>
-						<v-tooltip activator="parent" location="bottom">
-							{{ __("Offline Invoices") }} ({{ pendingInvoices }})
-						</v-tooltip>
-					</v-btn>
-
-					<!-- Notification bell centered between offline invoices and menu -->
+					<!-- Notification bell -->
 					<div class="notification-wrapper">
 						<slot name="notification-bell"></slot>
 					</div>
@@ -151,35 +130,7 @@
 						isRtl ? 'rtl-primary-actions' : 'ltr-primary-actions',
 					]"
 				>
-					<v-btn
-						icon
-						:class="[
-							'offline-invoices-btn pos-themed-button',
-							isRtl ? 'rtl-offline-btn' : 'ltr-offline-btn',
-							{ 'has-pending': pendingInvoices > 0 },
-						]"
-						:aria-label="__('View offline invoices') + ` (${pendingInvoices})`"
-						:aria-describedby="'offline-invoices-tooltip'"
-						@click="$emit('show-offline-invoices')"
-						@keydown.enter="$emit('show-offline-invoices')"
-						tabindex="0"
-					>
-						<v-badge v-if="pendingInvoices > 0" :content="pendingInvoices" color="error" floating>
-							<v-icon class="pos-text-primary">mdi-file-document-multiple-outline</v-icon>
-						</v-badge>
-						<v-icon v-else class="pos-text-primary">mdi-file-document-multiple-outline</v-icon>
-						<v-tooltip
-							id="offline-invoices-tooltip"
-							activator="parent"
-							:location="isRtl ? 'bottom start' : 'bottom end'"
-							:open-delay="500"
-							:close-delay="200"
-						>
-							{{ __("Offline Invoices") }} ({{ pendingInvoices }})
-						</v-tooltip>
-					</v-btn>
-
-					<!-- Notification bell between offline invoices and menu -->
+					<!-- Notification bell -->
 					<div class="notification-wrapper">
 						<slot name="notification-bell"></slot>
 					</div>

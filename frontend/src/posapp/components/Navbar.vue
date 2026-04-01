@@ -76,6 +76,7 @@
 			v-model:item="item"
 			:company="company"
 			:company-img="companyImg"
+			:pending-invoices="pendingInvoices"
 			:items="items"
 			@change-page="changePage"
 		/>
@@ -327,6 +328,11 @@ export default {
 		},
 		updateNavigationItems() {
 			const items = [...this.baseItems];
+			items.push({
+				text: "Offline Invoices",
+				icon: "mdi-file-document-multiple-outline",
+				action: "show-offline-invoices",
+			});
 			if (this.posProfile?.posa_enable_cash_movement) {
 				items.push({
 					text: "Cash Movement",
@@ -335,6 +341,13 @@ export default {
 				});
 			}
 			this.items = items;
+		},
+		changePage(item) {
+			if (item?.action === "show-offline-invoices") {
+				this.showOfflineInvoices = true;
+				return;
+			}
+			this.$emit("change-page", item);
 		},
 
 		initializeNavbar() {

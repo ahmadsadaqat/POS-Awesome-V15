@@ -30,14 +30,29 @@
 				:key="item.text"
 				:value="index"
 				:to="item.to"
-				@click="handleItemClick"
+				@click="handleItemClick(item, index)"
 				class="drawer-item"
 				active-class="active-item"
 			>
 				<template v-slot:prepend>
-					<v-icon class="drawer-icon">{{ item.icon }}</v-icon>
+					<v-badge
+						v-if="item.action === 'show-offline-invoices' && pendingInvoices > 0"
+						:content="pendingInvoices"
+						color="error"
+						floating
+					>
+						<v-icon class="drawer-icon">{{ item.icon }}</v-icon>
+					</v-badge>
+					<v-icon v-else class="drawer-icon">{{ item.icon }}</v-icon>
 				</template>
-				<v-list-item-title class="drawer-item-title">{{ item.text }}</v-list-item-title>
+				<v-list-item-title
+					:class="[
+						'drawer-item-title',
+						{ 'offline-item-title': item.action === 'show-offline-invoices' },
+					]"
+				>
+					{{ item.text }}
+				</v-list-item-title>
 			</v-list-item>
 		</v-list>
 		<!-- Sport section, hidden by default -->
@@ -62,9 +77,13 @@ const props = defineProps({
 	items: Array,
 	item: Number,
 	isDark: Boolean,
+	pendingInvoices: {
+		type: Number,
+		default: 0,
+	},
 });
 
-const emit = defineEmits(["update:drawer", "update:item"]);
+const emit = defineEmits(["update:drawer", "update:item", "change-page"]);
 const { isRtl, rtlClasses } = useRtl();
 
 const mini = ref(false);
@@ -114,7 +133,9 @@ function handleMouseLeave() {
 	}, 250);
 }
 
-function handleItemClick() {
+function handleItemClick(item, index) {
+	emit("change-page", item);
+	activeItem.value = index;
 	// Close drawer after selection if mobile
 	if (window.innerWidth < 1024) {
 		closeDrawer();
@@ -169,6 +190,10 @@ function closeDrawer() {
 /* Styling for the title text of navigation drawer list items */
 .drawer-item-title {
 	display: none !important;
+}
+
+.drawer-item-title.offline-item-title {
+	display: block !important;
 }
 
 /* Hover effect for all list items in the navigation drawer */
