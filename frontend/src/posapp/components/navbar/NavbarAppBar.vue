@@ -56,9 +56,6 @@
 		<div :class="['pos-navbar-actions-section', isRtl ? 'rtl-actions-section' : 'ltr-actions-section']">
 			<!-- Mobile: Show only essential items, others in menu -->
 			<template v-if="isMobile">
-				<!-- Always visible status indicator -->
-				<slot name="status-indicator"></slot>
-
 				<div
 					:class="[
 						'primary-actions-cluster mobile-primary-actions',
@@ -79,30 +76,6 @@
 
 			<!-- Desktop: Show all items normally -->
 			<template v-else>
-				<!-- Enhanced connectivity status indicator (kept outside info menu) -->
-				<div class="gadget-wrapper status-gadget">
-					<slot name="status-indicator"></slot>
-				</div>
-
-				<NavbarInfoGadgets
-					:class="['info-gadgets-wrapper', isRtl ? 'rtl-info-gadgets' : 'ltr-info-gadgets']"
-				>
-					<!-- Cache Usage Meter -->
-					<template #cache-usage-meter>
-						<slot name="cache-usage-meter"></slot>
-					</template>
-
-					<!-- Database Usage Gadget -->
-					<template #db-usage-gadget>
-						<slot name="db-usage-gadget"></slot>
-					</template>
-
-					<!-- CPU Load Gadget -->
-					<template #cpu-gadget>
-						<slot name="cpu-gadget"></slot>
-					</template>
-				</NavbarInfoGadgets>
-
 				<div :class="['profile-section', isRtl ? 'rtl-profile-section' : 'ltr-profile-section']">
 					<v-chip
 						variant="outlined"
@@ -166,13 +139,9 @@
 <script>
 import { useRtl } from "../../composables/core/useRtl";
 import posLogo from "../pos/pos.png";
-import NavbarInfoGadgets from "./NavbarInfoGadgets.vue";
 
 export default {
 	name: "NavbarAppBar",
-	components: {
-		NavbarInfoGadgets,
-	},
 	setup() {
 		const { isRtl, rtlStyles, rtlClasses } = useRtl();
 		return {

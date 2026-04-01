@@ -24,6 +24,18 @@
 
 		<v-divider />
 
+		<div class="drawer-status-wrap">
+			<StatusIndicator
+				:network-online="networkOnline"
+				:server-online="serverOnline"
+				:server-connecting="serverConnecting"
+				:is-ip-host="isIpHost"
+				@retry-status="emit('retry-status')"
+			/>
+		</div>
+
+		<v-divider />
+
 		<v-list density="compact" nav v-model:selected="activeItem" selected-class="active-item">
 			<v-list-item
 				v-for="(item, index) in items"
@@ -65,6 +77,7 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import { useRtl } from "../../composables/core/useRtl";
+import StatusIndicator from "./StatusIndicator.vue";
 
 defineOptions({
 	name: "NavbarDrawer",
@@ -77,13 +90,17 @@ const props = defineProps({
 	items: Array,
 	item: Number,
 	isDark: Boolean,
+	networkOnline: Boolean,
+	serverOnline: Boolean,
+	serverConnecting: Boolean,
+	isIpHost: Boolean,
 	pendingInvoices: {
 		type: Number,
 		default: 0,
 	},
 });
 
-const emit = defineEmits(["update:drawer", "update:item", "change-page"]);
+const emit = defineEmits(["update:drawer", "update:item", "change-page", "retry-status"]);
 const { isRtl, rtlClasses } = useRtl();
 
 const mini = ref(false);
@@ -194,6 +211,10 @@ function closeDrawer() {
 
 .drawer-item-title.offline-item-title {
 	display: block !important;
+}
+
+.drawer-status-wrap {
+	padding: 6px 8px;
 }
 
 /* Hover effect for all list items in the navigation drawer */

@@ -11,37 +11,6 @@
 			@go-desk="goDesk"
 			@show-offline-invoices="showOfflineInvoices = true"
 		>
-			<!-- Slot for status indicator -->
-			<template #status-indicator>
-				<StatusIndicator
-					:network-online="networkOnline"
-					:server-online="serverOnline"
-					:server-connecting="serverConnecting"
-					:is-ip-host="isIpHost"
-					@retry-status="$emit('retry-status')"
-				/>
-			</template>
-
-			<!-- Slot for cache usage meter -->
-			<template #cache-usage-meter>
-				<CacheUsageMeter
-					:cache-usage="cacheUsage"
-					:cache-usage-loading="cacheUsageLoading"
-					:cache-usage-details="cacheUsageDetails"
-					@refresh="refreshCacheUsage"
-				/>
-			</template>
-
-			<!-- Slot for CPU gadget -->
-			<template #cpu-gadget>
-				<ServerUsageGadget />
-			</template>
-
-			<!-- Slot for Database Usage Gadget -->
-			<template #db-usage-gadget>
-				<DatabaseUsageGadget />
-			</template>
-
 			<template #notification-bell>
 				<NotificationBell
 					:notifications="history"
@@ -77,8 +46,13 @@
 			:company="company"
 			:company-img="companyImg"
 			:pending-invoices="pendingInvoices"
+			:network-online="networkOnline"
+			:server-online="serverOnline"
+			:server-connecting="serverConnecting"
+			:is-ip-host="isIpHost"
 			:items="items"
 			@change-page="changePage"
+			@retry-status="$emit('retry-status')"
 		/>
 
 		<!-- Use the modular AboutDialog component -->
@@ -108,13 +82,7 @@
 			@update:modelValue="(val) => !val && toastStore.onSnackbarClosed()"
 		>
 			<div class="d-flex align-center ga-3">
-				<v-progress-circular
-					v-if="toastLoading"
-					indeterminate
-					size="18"
-					width="2"
-					color="white"
-				/>
+				<v-progress-circular v-if="toastLoading" indeterminate size="18" width="2" color="white" />
 				<span>{{ text }}</span>
 			</div>
 			<template v-slot:actions>
@@ -127,13 +95,10 @@
 </template>
 
 <script>
-import { defineAsyncComponent } from "vue";
 import NavbarAppBar from "./navbar/NavbarAppBar.vue";
 import NavbarDrawer from "./navbar/NavbarDrawer.vue";
 import NavbarMenu from "./navbar/NavbarMenu.vue";
 import NotificationBell from "./navbar/NotificationBell.vue";
-import StatusIndicator from "./navbar/StatusIndicator.vue";
-import CacheUsageMeter from "./navbar/CacheUsageMeter.vue";
 import AboutDialog from "./navbar/AboutDialog.vue";
 import OfflineInvoices from "./OfflineInvoices.vue";
 import posLogo from "./pos/pos.png";
@@ -141,9 +106,6 @@ import { forceClearAllCache } from "../../offline/index";
 import { clearAllCaches } from "../../utils/clearAllCaches";
 import { isOffline } from "../../offline/index";
 import { useRtl } from "../composables/core/useRtl";
-
-const ServerUsageGadget = defineAsyncComponent(() => import("./navbar/ServerUsageGadget.vue"));
-const DatabaseUsageGadget = defineAsyncComponent(() => import("./navbar/DatabaseUsageGadget.vue"));
 
 import { useToastStore } from "../stores/toastStore.js";
 import { useUIStore } from "../stores/uiStore.js";
@@ -156,7 +118,15 @@ export default {
 		const toastStore = useToastStore();
 		const uiStore = useUIStore();
 		// Extract reactive refs
-		const { visible, text, color, timeout, loading: toastLoading, history, unreadCount } = storeToRefs(toastStore);
+		const {
+			visible,
+			text,
+			color,
+			timeout,
+			loading: toastLoading,
+			history,
+			unreadCount,
+		} = storeToRefs(toastStore);
 		const { isFrozen, freezeTitle, freezeMessage } = storeToRefs(uiStore);
 
 		return {
@@ -182,12 +152,8 @@ export default {
 		NavbarDrawer,
 		NavbarMenu,
 		NotificationBell,
-		StatusIndicator,
-		CacheUsageMeter,
 		AboutDialog,
 		OfflineInvoicesDialog: OfflineInvoices,
-		ServerUsageGadget,
-		DatabaseUsageGadget,
 	},
 	props: {
 		posProfile: {
