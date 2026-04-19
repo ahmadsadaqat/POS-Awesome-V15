@@ -136,7 +136,7 @@
 									<div class="summary-tile__value">{{ filteredHistoryInvoices.length }}</div>
 									<div class="summary-tile__meta">{{ __("Completed and active sales in this range") }}</div>
 								</div>
-								<div class="summary-tile summary-tile--primary">
+								<!-- <div class="summary-tile summary-tile--primary">
 									<div class="summary-tile__label">{{ __("Gross Sales") }}</div>
 									<div class="summary-tile__value">
 										{{ currencySymbol(posProfile?.currency) }} {{ formatCurrency(historyTotals.gross) }}
@@ -163,7 +163,7 @@
 										{{ currencySymbol(posProfile?.currency) }} {{ formatCurrency(historyTotals.outstanding) }}
 									</div>
 									<div class="summary-tile__meta">{{ __("Balances still pending") }}</div>
-								</div>
+								</div> -->
 							</div>
 
 							<div v-if="loading && activeTab === 'history'" class="tab-loader">
