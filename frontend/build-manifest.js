@@ -1,5 +1,5 @@
 const DIST_BASE_URL = "/assets/posawesome/dist/js/";
-const STATIC_ENTRY_NAMES = new Set(["posawesome", "loader"]);
+const STATIC_ENTRY_NAMES = new Set(["loader"]);
 
 export function getEntryFileName(chunkInfo) {
 	return STATIC_ENTRY_NAMES.has(chunkInfo?.name) ? "[name].js" : "[name]-[hash].js";
@@ -24,11 +24,15 @@ function getChunkFileName(bundle, chunkName) {
 export function buildVersionPayload(version, bundle = {}) {
 	const offlineIndexFile = getChunkFileName(bundle, "offline/index");
 
+	const posawesomeFile = getChunkFileName(bundle, "posawesome");
+
 	return {
 		version,
 		assets: {
 			loader: toVersionedPublicAssetUrl("loader.js", version),
-			posawesome: toVersionedPublicAssetUrl("posawesome.js", version),
+			posawesome: posawesomeFile
+				? toPublicAssetUrl(posawesomeFile)
+				: toVersionedPublicAssetUrl("posawesome.js", version),
 			css: toVersionedPublicAssetUrl("posawesome.css", version),
 			offlineIndex: offlineIndexFile
 				? toPublicAssetUrl(offlineIndexFile)
