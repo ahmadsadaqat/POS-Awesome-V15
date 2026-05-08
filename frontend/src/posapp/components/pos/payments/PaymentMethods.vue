@@ -34,6 +34,7 @@
 						:prefix="currencySymbol(currency)"
 						@focus="$emit('set-rest-amount', payment, isReturn)"
 						:readonly="isGiftCardPayment(payment)"
+						ref="paymentInputs"
 					></v-text-field>
 				</v-col>
 				<v-col cols="12" md="5" v-if="!isMpesaC2bPayment(payment)">
@@ -146,6 +147,25 @@ const handlePrimaryAction = (payment) => {
 	}
 	emit("set-full-amount", payment, props.isReturn);
 };
+
+import { ref } from "vue";
+const paymentInputs = ref([]);
+
+const focusInput = (index) => {
+	if (paymentInputs.value && paymentInputs.value[index]) {
+		const inputComponent = paymentInputs.value[index];
+		if (inputComponent.focus) {
+			inputComponent.focus();
+		} else if (inputComponent.$el) {
+			const input = inputComponent.$el.querySelector("input");
+			if (input) input.focus();
+		}
+	}
+};
+
+defineExpose({
+	focusInput
+});
 </script>
 
 <style scoped>

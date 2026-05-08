@@ -1,4 +1,4 @@
-﻿<!-- eslint-disable vue/multi-word-component-names -->
+<!-- eslint-disable vue/multi-word-component-names -->
 <template>
 	<div :class="['payment-shell', { 'payment-shell--dialog': dialogMode }]">
 		<v-card
@@ -49,6 +49,7 @@
 							<h3 class="payment-section__title">{{ __("Payment Methods") }}</h3>
 						</div>
 						<PaymentMethods
+							ref="paymentMethodsRef"
 							:payments="visiblePaymentMethods"
 							:currency="invoice_doc.currency"
 							:isReturn="invoice_doc.is_return"
@@ -386,6 +387,7 @@ const backgroundStatusCheck = ref(null);
 const paymentVisible = ref(false);
 const paymentContainer = ref(null);
 const submitButton = ref(null);
+const paymentMethodsRef = ref(null);
 const _shortcutHandlers = ref({});
 const readonly = ref(false); // Add missing readonly ref
 const submissionInFlight = ref(false);
@@ -1582,6 +1584,16 @@ const handlePaymentShortcut = (event) => {
 		event.preventDefault();
 		event.stopPropagation();
 		submit(null, false, false);
+		return;
+	}
+
+	if ((event.ctrlKey || event.metaKey) && ['1', '2', '3', '4'].includes(key)) {
+		event.preventDefault();
+		event.stopPropagation();
+		const index = parseInt(key) - 1;
+		if (paymentMethodsRef.value && paymentMethodsRef.value.focusInput) {
+			paymentMethodsRef.value.focusInput(index);
+		}
 	}
 };
 
