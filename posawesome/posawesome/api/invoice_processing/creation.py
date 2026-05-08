@@ -813,8 +813,17 @@ def update_invoice(data):
 
     _deduplicate_free_items(invoice_doc)
 
+    original_payments = data.get("payments") or [p.as_dict() for p in invoice_doc.payments]
+
     # Set missing values first
     invoice_doc.set_missing_values()
+
+    if original_payments:
+        invoice_doc.set("payments", [])
+        for p in original_payments:
+            invoice_doc.append("payments", p)
+        if hasattr(invoice_doc, "set_account_for_mode_of_payment"):
+            invoice_doc.set_account_for_mode_of_payment()
     if effective_price_list:
         invoice_doc.selling_price_list = effective_price_list
 
