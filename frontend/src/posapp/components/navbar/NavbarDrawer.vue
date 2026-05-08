@@ -207,7 +207,11 @@ function closeDrawer() {
 
 /* Styling for the company name text within the drawer header */
 .drawer-company {
-	display: none !important;
+	margin-left: 12px;
+	flex: 1;
+	font-weight: 500;
+	font-size: 1rem;
+	color: #0097a7;
 }
 
 /* Styling for icons within the navigation drawer list items */
@@ -218,11 +222,11 @@ function closeDrawer() {
 
 /* Styling for the title text of navigation drawer list items */
 .drawer-item-title {
-	display: none !important;
-}
-
-.drawer-item-title.offline-item-title {
-	display: block !important;
+	margin-left: 8px;
+	font-weight: 500;
+	font-size: 0.95rem;
+	color: var(--pos-text-primary) !important;
+	font-family: "Roboto", sans-serif;
 }
 
 .drawer-status-wrap {
