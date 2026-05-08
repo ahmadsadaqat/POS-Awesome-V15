@@ -328,7 +328,7 @@ export default {
 			],
 			([value]) => {
 				if (!isEditingAdditionalDiscount.value) {
-					additionalDiscountDisplay.value = normalizeAdditionalDiscountDisplay(value);
+					additionalDiscountDisplay.value = normalizeDiscountDisplay(value);
 				}
 			},
 		);
@@ -423,7 +423,8 @@ export default {
 			};
 		});
 		const handleAdditionalDiscountUpdate = (value) => {
-			invoiceStore.setAdditionalDiscount(normalizeAdditionalDiscountInput(value));
+			const parsed = parseFloat(String(value || "0").replace(/[^\d.-]/g, ""));
+			invoiceStore.setAdditionalDiscount(Number.isFinite(parsed) ? parsed : 0);
 		};
 		const handleAdditionalDiscountFocus = () => {
 			isEditingAdditionalDiscount.value = true;
