@@ -1,25 +1,17 @@
 <template>
 	<v-navigation-drawer
 		v-model="drawerOpen"
-		:rail="mini"
-		expand-on-hover
 		width="220"
-		:class="['drawer-custom', { 'drawer-visible': drawerOpen }, rtlClasses]"
-		@mouseleave="handleMouseLeave"
+		:class="['drawer-custom', rtlClasses]"
 		temporary
 		:location="isRtl ? 'right' : 'left'"
 		:scrim="scrimColor"
 	>
-		<div v-if="!mini" class="drawer-header">
+		<div class="drawer-header">
 					<v-avatar size="40">
 						<v-img :src="companyImg" alt="Company logo" />
 					</v-avatar>
 					<span class="drawer-company">{{ company }}</span>
-				</div>
-				<div v-else class="drawer-header-mini">
-					<v-avatar size="40">
-						<v-img :src="companyImg" alt="Company logo" />
-					</v-avatar>
 				</div>
 
 				<v-divider />
@@ -84,7 +76,7 @@
 					<span class="drawer-footer-action__icon">
 						<v-icon color="white">{{ footerAction.icon }}</v-icon>
 					</span>
-					<span v-if="!mini" class="drawer-footer-action__copy">
+					<span class="drawer-footer-action__copy">
 						<span class="drawer-footer-action__title">{{ footerAction.text }}</span>
 						<span v-if="footerAction.subtitle" class="drawer-footer-action__subtitle">
 							{{ footerAction.subtitle }}
@@ -168,21 +160,13 @@ watch(activeItem, (val) => {
 });
 
 function handleMouseLeave() {
-	if (!drawerOpen.value) return;
-	clearTimeout(closeTimeout);
-	closeTimeout = setTimeout(() => {
-		drawerOpen.value = false;
-		mini.value = true;
-	}, 250);
+	// No-op: simple temporary drawer, no rail mode
 }
 
 function handleItemClick(item, index) {
 	emit("change-page", item);
 	activeItem.value = index;
-	// Close drawer after selection if mobile
-	if (window.innerWidth < 1024) {
-		closeDrawer();
-	}
+	closeDrawer();
 }
 
 function handleFooterActionClick() {
@@ -192,7 +176,6 @@ function handleFooterActionClick() {
 
 function closeDrawer() {
 	drawerOpen.value = false;
-	mini.value = true;
 }
 </script>
 

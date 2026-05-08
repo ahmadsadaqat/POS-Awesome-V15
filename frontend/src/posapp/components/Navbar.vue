@@ -40,6 +40,7 @@
 					@show-about="showAboutDialog = true"
 					@toggle-theme="toggleTheme"
 					@logout="logOut"
+					@toggle-offline="toggleManualOffline"
 				/>
 			</template>
 		</NavbarAppBar>
