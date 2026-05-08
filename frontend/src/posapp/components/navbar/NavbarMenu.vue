@@ -430,6 +430,14 @@ export default {
 					tone: "info",
 					handler: "syncInvoices",
 				},
+				{
+					id: "toggle-offline",
+					label: this.manualOffline ? __("Go Online") : __("Go Offline"),
+					subtitle: this.manualOffline ? __("Reconnect to server") : __("Work disconnected"),
+					icon: this.manualOffline ? "mdi-lan-connect" : "mdi-lan-disconnect",
+					tone: this.manualOffline ? "success" : "warning",
+					handler: "toggleOfflineAction",
+				},
 				!this.posProfile?.posa_hide_closing_shift
 					? {
 							id: "close-shift",
@@ -638,6 +646,10 @@ export default {
 				case "closeShift":
 					this.closeMenu();
 					this.$emit("close-shift");
+					break;
+				case "toggleOfflineAction":
+					this.closeMenu();
+					this.$emit("toggle-offline");
 					break;
 				case "openLanguageDialog":
 					this.closeMenu();
