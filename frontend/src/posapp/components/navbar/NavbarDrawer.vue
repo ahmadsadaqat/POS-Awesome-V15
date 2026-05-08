@@ -10,9 +10,7 @@
 		:location="isRtl ? 'right' : 'left'"
 		:scrim="scrimColor"
 	>
-		<div class="drawer-shell">
-			<div>
-				<div v-if="!mini" class="drawer-header">
+		<div v-if="!mini" class="drawer-header">
 					<v-avatar size="40">
 						<v-img :src="companyImg" alt="Company logo" />
 					</v-avatar>

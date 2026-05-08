@@ -239,6 +239,7 @@ const memoizedIsNegative = computed(() => {
 const {
 	breakpoint,
 	responsiveHeaders,
+	isColumnVisible,
 	containerStyles,
 	containerClasses,
 	tableClasses,

@@ -263,6 +263,7 @@ const toastStore = useToastStore();
 const uiStore = useUIStore();
 const invoiceStore = useInvoiceStore();
 const employeeStore = useEmployeeStore();
+const { currentCashier } = storeToRefs(employeeStore);
 const { selectedCustomer } = storeToRefs(customersStore);
 const {
 	posProfile: uiPosProfile,
