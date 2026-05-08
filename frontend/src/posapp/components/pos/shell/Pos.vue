@@ -222,7 +222,6 @@ import { useOffers } from "../../../composables/pos/shared/useOffers";
 import { clearExpiredCustomerBalances } from "../../../../offline/index";
 import { useResponsive } from "../../../composables/core/useResponsive";
 import { useRtl } from "../../../composables/core/useRtl";
-import { useCustomersStore } from "../../../stores/customersStore.js";
 import { useUIStore } from "../../../stores/uiStore.js";
 import { useInvoiceStore } from "../../../stores/invoiceStore.js";
 import { useItemsStore } from "../../../stores/itemsStore.js";
@@ -306,6 +305,10 @@ export default {
 		const discountPercentageOfferName = computed(
 			() => invoicePanel.value?.discount_percentage_offer_name || null,
 		);
+		const showUnsignedReturnDiscount = computed(
+			() =>
+				!!invoicePanel.value?.return_discount_meta && !posProfile.value?.posa_use_percentage_discount,
+		);
 		const normalizeDiscountDisplay = (value) => {
 			if (value === 0 || value === "0") {
 				return "";
@@ -317,11 +320,18 @@ export default {
 			normalizeDiscountDisplay(additionalDiscountPercentage.value),
 		);
 
-		watch(additionalDiscount, (value) => {
-			if (!isEditingAdditionalDiscount.value) {
-				additionalDiscountDisplay.value = normalizeDiscountDisplay(value);
-			}
-		});
+		watch(
+			() => [
+				additionalDiscount.value,
+				invoicePanel.value?.return_discount_meta?.prorated_discount,
+				posProfile.value?.posa_use_percentage_discount,
+			],
+			([value]) => {
+				if (!isEditingAdditionalDiscount.value) {
+					additionalDiscountDisplay.value = normalizeAdditionalDiscountDisplay(value);
+				}
+			},
+		);
 
 		watch(additionalDiscountPercentage, (value) => {
 			if (!isEditingAdditionalDiscountPercentage.value) {
@@ -413,7 +423,7 @@ export default {
 			};
 		});
 		const handleAdditionalDiscountUpdate = (value) => {
-			invoiceStore.setAdditionalDiscount(value);
+			invoiceStore.setAdditionalDiscount(normalizeAdditionalDiscountInput(value));
 		};
 		const handleAdditionalDiscountFocus = () => {
 			isEditingAdditionalDiscount.value = true;
@@ -579,11 +589,7 @@ export default {
 		};
 	},
 	data: function () {
-		return {
-			// dialog moved to setup ref
-			itemsLoaded: false,
-			customersLoaded: false,
-		};
+		return {};
 	},
 
 	components: {
@@ -620,11 +626,6 @@ export default {
 				// this.uiStore.setPosSettings(doc); // We might need to implement this if it doesn't exist
 			});
 		},
-		checkLoadingComplete() {
-			if (this.itemsLoaded && this.customersLoaded) {
-				// Loading complete logic
-			}
-		},
 		// handleAddItem removed as ItemsSelector handles pos addition internally
 		handleRegisterPosData(data) {
 			this.pos_profile = data.pos_profile;
@@ -647,31 +648,13 @@ export default {
 			// Watch store for updates
 			this.$watch(
 				() => this.uiStore.posProfile,
-				async (newProfile) => {
+				(newProfile) => {
 					if (newProfile && newProfile.name) {
 						this.pos_profile = newProfile;
 						this.get_offers(newProfile.name, newProfile);
-
-						// Initialize Customers Store
-						const customersStore = useCustomersStore();
-						customersStore.setPosProfile(newProfile);
-						await customersStore.get_customer_names();
 					}
 				},
 				{ deep: true, immediate: true },
-			);
-
-			// Items loading state check
-			const { itemsLoaded } = storeToRefs(this.itemsStore);
-			this.$watch(
-				() => itemsLoaded.value,
-				(val) => {
-					if (val) {
-						this.itemsLoaded = true;
-						this.checkLoadingComplete();
-					}
-				},
-				{ immediate: true },
 			);
 		});
 	},
@@ -679,18 +662,6 @@ export default {
 	created() {
 		// Clean up expired customer balance cache on POS load
 		clearExpiredCustomerBalances();
-		const customersStore = useCustomersStore();
-		const { customersLoaded } = storeToRefs(customersStore);
-		this.$watch(
-			() => customersLoaded.value,
-			(value) => {
-				if (value) {
-					this.customersLoaded = true;
-					this.checkLoadingComplete();
-				}
-			},
-			{ immediate: true },
-		);
 	},
 };
 </script>

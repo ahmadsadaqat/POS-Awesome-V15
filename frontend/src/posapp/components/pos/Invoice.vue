@@ -306,7 +306,9 @@ import { useToastStore } from "../../stores/toastStore.js";
 import { useUIStore } from "../../stores/uiStore.js";
 import { storeToRefs } from "pinia";
 import stockCoordinator from "../../utils/stockCoordinator";
-import { ref } from "vue";
+import { getCurrentInstance, ref } from "vue";
+import { save_and_clear_invoice as saveAndClearInvoiceAction } from "./invoice_utils/actions";
+import { fetchDraftInvoices } from "../../utils/draftInvoices";
 
 // Composables
 import { useOnlineStatus } from "../../composables/core/useOnlineStatus";
@@ -316,6 +318,7 @@ import { useInvoiceOffers } from "../../composables/pos/invoice/useInvoiceOffers
 import { useInvoiceUI } from "../../composables/pos/invoice/useInvoiceUI";
 import { useInvoicePrinting } from "../../composables/pos/invoice/useInvoicePrinting";
 import { useInvoiceStock } from "../../composables/pos/invoice/useInvoiceStock";
+import { usePaymentPrinting } from "../../composables/pos/payments/usePaymentPrinting";
 import {
 	createInvoiceShortcutListeners,
 	registerInvoiceShortcutListener,
@@ -326,19 +329,22 @@ export default {
 	name: "POSInvoice",
 	mixins: [format],
 	setup() {
+		const instance = getCurrentInstance();
 		const uiStore = useUIStore();
 		const invoiceStore = useInvoiceStore();
 		const customersStore = useCustomersStore();
 		const toastStore = useToastStore();
 		const { isOnline } = useOnlineStatus();
 
-		const { activeView } = storeToRefs(uiStore);
+		const { activeView, posProfile: livePosProfile } = storeToRefs(uiStore);
 		const { selectedCustomer, refreshToken: customerRefreshToken } = storeToRefs(customersStore);
 		const {
 			items,
 			packedItems: packed_items,
 			invoiceDoc: invoice_doc,
 			invoiceType,
+			flowToLoad,
+			flowContext,
 		} = storeToRefs(invoiceStore);
 		const itemsTableRef = ref(null);
 		const currencyState = useInvoiceCurrency({}, {});
@@ -347,14 +353,22 @@ export default {
 
 		// New composables
 		const uiLogic = useInvoiceUI();
+		const { loadPrintPage } = usePaymentPrinting({
+			invoiceDoc: invoice_doc,
+			posProfile: livePosProfile,
+			invoiceType,
+		});
 		const printingLogic = useInvoicePrinting(
-			ref(uiStore.posProfile),
-			(name) => uiStore.loadPrintPage(name), // Assuming this exists or passed via mixin/store
-			itemActions.save_and_clear_invoice, // Need to verify if this is available
+			livePosProfile,
+			loadPrintPage,
+			() => {
+				if (!instance?.proxy) {
+					return Promise.resolve(null);
+				}
+				return saveAndClearInvoiceAction(instance.proxy);
+			},
 			invoice_doc,
 		);
-		// Note: save_and_clear_invoice might be in methods mixin, not composable.
-		// We'll keep print logic partly in component if dependencies are complex.
 
 		const stockLogic = useInvoiceStock(items, packed_items, uiStore.eventBus, () => {});
 
@@ -368,6 +382,8 @@ export default {
 			selectedCustomer,
 			customerRefreshToken,
 			invoiceType,
+			flowToLoad,
+			flowContext,
 			itemsTableRef,
 			...currencyState,
 			...itemActions,
@@ -735,6 +751,23 @@ export default {
 			this.fetch_price_lists();
 			this.update_price_list();
 			this.fetch_available_currencies();
+			this.refresh_parked_orders();
+		},
+		async refresh_parked_orders() {
+			if (!this.pos_profile || !this.pos_opening_shift?.name) {
+				this.uiStore.setParkedOrders([]);
+				return;
+			}
+
+			try {
+				const drafts = await fetchDraftInvoices({
+					posOpeningShift: this.pos_opening_shift,
+					posProfile: this.pos_profile,
+				});
+				this.uiStore.setParkedOrders(drafts);
+			} catch (error) {
+				console.error("Error refreshing parked orders:", error);
+			}
 		},
 		handleClearInvoice() {
 			this.clear_invoice();
@@ -745,6 +778,32 @@ export default {
 		},
 		handleLoadOrder(data) {
 			this.new_order(data);
+		},
+		handleLoadFlow(flow) {
+			if (!flow?.prepared_doc) {
+				return;
+			}
+
+			this.invoiceStore.setFlowContext?.(flow.flow_context || null);
+			const action = flow?.action || flow?.flow_context?.prepared_action;
+			const targetDoctype = flow?.flow_context?.target_doctype || flow?.prepared_doc?.doctype || "";
+
+			if (targetDoctype === "Quotation" || action === "quote_edit_draft") {
+				this.invoiceType = "Quotation";
+				this.invoiceTypes = ["Invoice", "Order", "Quotation"];
+			} else if (
+				targetDoctype === "Sales Order" ||
+				action === "order_load" ||
+				action === "quote_to_order"
+			) {
+				this.invoiceType = "Order";
+				this.invoiceTypes = ["Invoice", "Order", "Quotation"];
+			} else {
+				this.invoiceType = "Invoice";
+				this.invoiceTypes = ["Invoice", "Order", "Quotation"];
+			}
+
+			this.load_invoice(flow.prepared_doc, { preserveStickies: true });
 		},
 
 		calcProratedReturnDiscount(returnDoc) {
@@ -787,6 +846,16 @@ export default {
 			this.invoiceType = "Return";
 			this.invoiceTypes = ["Return"];
 			this.invoice_doc.is_return = 1;
+			if (Array.isArray(this.invoice_doc.payments)) {
+				this.invoice_doc.payments.forEach((payment) => {
+					const amount = this.flt(payment.amount || 0, this.currency_precision);
+					payment.amount = amount ? -Math.abs(amount) : 0;
+					if (payment.base_amount !== undefined) {
+						const baseAmount = this.flt(payment.base_amount || 0, this.currency_precision);
+						payment.base_amount = baseAmount ? -Math.abs(baseAmount) : 0;
+					}
+				});
+			}
 			if (this.items && this.items.length) {
 				this.items.forEach((item) => {
 					if (item.qty > 0) item.qty = -Math.abs(item.qty);
@@ -839,6 +908,20 @@ export default {
 		},
 		handleShowPaymentRequest() {
 			this.show_payment();
+		},
+		async resume_parked_order(draft) {
+			try {
+				const message = await this.load_draft_source_record(draft);
+				if (message) {
+					this.uiStore?.closeDrafts?.();
+				}
+			} catch (error) {
+				console.error("Error loading parked order:", error);
+				this.toastStore.show({
+					title: __("Unable to load parked order"),
+					color: "error",
+				});
+			}
 		},
 		handleOpenCustomerDisplayRequest() {
 			if (this.eventBus && typeof this.eventBus.emit === "function") {
@@ -923,6 +1006,22 @@ export default {
 			(doc) => {
 				if (doc) {
 					this.handleLoadOrder(doc);
+				}
+			},
+			{ deep: false },
+		);
+
+		this.$watch(
+			() => this.invoiceStore.flowToLoad,
+			(flow) => {
+				if (flow?.prepared_doc) {
+					this.handleLoadFlow(flow);
+				} else if (flow) {
+					this.handleLoadFlow({
+						action: this.invoiceStore.flowContext?.prepared_action,
+						prepared_doc: flow,
+						flow_context: this.invoiceStore.flowContext,
+					});
 				}
 			},
 			{ deep: false },

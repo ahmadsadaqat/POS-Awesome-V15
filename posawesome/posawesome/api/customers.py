@@ -12,6 +12,7 @@ from erpnext.accounts.doctype.loyalty_program.loyalty_program import (
 )
 from frappe.utils.caching import redis_cache
 from .utils import fetch_sales_person_names
+from .stored_value import get_stored_value_summary
 
 
 def get_customer_groups(pos_profile):
@@ -22,9 +23,7 @@ def get_customer_groups(pos_profile):
             group_name = data.get("customer_group") if data else None
             if not group_name:
                 continue
-            customer_groups.extend(
-                [d.get("name") for d in get_child_nodes("Customer Group", group_name)]
-            )
+            customer_groups.extend([d.get("name") for d in get_child_nodes("Customer Group", group_name)])
 
     return list(set(customer_groups))
 
@@ -116,6 +115,7 @@ def get_customer_names(pos_profile, limit=None, offset=None, start_after=None, m
             filters=filters,
             fields=[
                 "name",
+                "modified",
                 "mobile_no",
                 "email_id",
                 "tax_id",
@@ -145,7 +145,7 @@ def get_customers_count(pos_profile):
 
 
 @frappe.whitelist()
-def get_customer_info(customer=None):
+def get_customer_info(customer=None, company=None):
     customer = cstr(customer or "").strip()
     if not customer:
         return {}
@@ -172,14 +172,9 @@ def get_customer_info(customer=None):
         "Customer Group", customer.customer_group, "default_price_list"
     )
 
-    effective_price_list = (
-        res.get("customer_price_list")
-        or res.get("customer_group_price_list")
-    )
+    effective_price_list = res.get("customer_price_list") or res.get("customer_group_price_list")
     if effective_price_list:
-        res["price_list_currency"] = frappe.get_value(
-            "Price List", effective_price_list, "currency"
-        )
+        res["price_list_currency"] = frappe.get_value("Price List", effective_price_list, "currency")
     else:
         res["price_list_currency"] = None
 
@@ -192,6 +187,15 @@ def get_customer_info(customer=None):
         )
         res["loyalty_points"] = lp_details.get("loyalty_points")
         res["conversion_factor"] = lp_details.get("conversion_factor")
+
+    company = cstr(company or "").strip()
+    if company:
+        stored_value = get_stored_value_summary(customer=customer.name, company=company)
+        res["stored_value_balance"] = stored_value.get("available_amount", 0)
+        res["stored_value_sources"] = stored_value.get("source_count", 0)
+    else:
+        res["stored_value_balance"] = 0
+        res["stored_value_sources"] = 0
 
     addresses = frappe.db.sql(
         """

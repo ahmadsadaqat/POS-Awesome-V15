@@ -1,3 +1,8 @@
+/**
+ * A catalogue item as stored in the offline IndexedDB cache.
+ * Fields mirror the ERPNext Item doctype; `[key: string]: any` accommodates
+ * custom fields added by the Frappe installation.
+ */
 export interface Item {
 	item_code: string;
 	item_name: string;
@@ -18,6 +23,12 @@ export interface Item {
 	[key: string]: any;
 }
 
+/**
+ * An {@link Item} that has been added to the active invoice.
+ * Carries per-line pricing and discount state alongside the item's catalogue data.
+ * `posa_row_id` is the stable row key used by `useInvoiceStore` — it is NOT the
+ * ERPNext `name` field and is generated client-side.
+ */
 export interface CartItem extends Item {
 	qty: number;
 	amount: number;
@@ -32,6 +43,11 @@ export interface CartItem extends Item {
 	[key: string]: any;
 }
 
+/**
+ * The active POS Invoice document, mirroring the ERPNext POS Invoice doctype.
+ * This is the root object managed by `useInvoiceStore`.
+ * Return invoices use negative `qty` and negative totals throughout.
+ */
 export interface InvoiceDoc {
 	name?: string;
 	doctype?: string;
@@ -55,6 +71,16 @@ export interface InvoiceDoc {
 	[key: string]: any;
 }
 
+export interface InvoiceDocRef {
+  name?: string;
+  doctype?: string;
+}
+
+export type PartialInvoiceDoc = Partial<InvoiceDoc> & InvoiceDocRef;
+
+/**
+ * A single payment line on an invoice (e.g. Cash, Card, Loyalty Points).
+ */
 export interface Payment {
 	mode_of_payment: string;
 	amount: number;
@@ -63,6 +89,9 @@ export interface Payment {
 	[key: string]: any;
 }
 
+/**
+ * A tax/charge row applied to the invoice, matching the ERPNext Sales Taxes and Charges table.
+ */
 export interface Tax {
 	charge_type?: string;
 	account_head?: string;
@@ -72,6 +101,11 @@ export interface Tax {
 	[key: string]: any;
 }
 
+/**
+ * Key fields from the active POS Profile document.
+ * The full profile carries many additional `posa_*` feature-flag fields; they are
+ * accessible via `[key: string]: any`.
+ */
 export interface POSProfile {
 	name: string;
 	company: string;
@@ -83,6 +117,9 @@ export interface POSProfile {
 	[key: string]: any;
 }
 
+/**
+ * A customer record from the offline customer cache.
+ */
 export interface Customer {
 	name: string;
 	customer_name: string;
@@ -96,12 +133,36 @@ export interface Customer {
 	[key: string]: any;
 }
 
+export interface CustomerSummary {
+  name: string;
+  customer_name: string;
+  email_id?: string;
+  mobile_no?: string;
+  primary_address?: string;
+  [key: string]: any;
+}
+
+export interface StoredCustomer extends CustomerSummary {
+  tax_id?: string;
+}
+
+export type CustomerInfo = Record<string, unknown>;
+
+/**
+ * Internal versioning metadata attached to the invoice store.
+ * `changeVersion` is incremented on every mutation and can be used to detect
+ * stale renders or trigger watchers.
+ */
 export interface InvoiceMetadata {
 	lastUpdated: number;
 	changeVersion: number;
 	[key: string]: any;
 }
 
+/**
+ * A delivery-charge option that can be selected on the invoice.
+ * Populated from the `posa_delivery_charges` child table on the POS Profile.
+ */
 export interface DeliveryCharge {
 	title: string;
 	rate: number;

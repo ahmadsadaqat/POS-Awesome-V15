@@ -12,6 +12,11 @@ from .customers import (
     make_address,
     set_customer_info,
 )
+from .commercial_flow import (
+    commit_document_flow_action,
+    list_source_documents,
+    prepare_document_flow_action,
+)
 from .invoices import (
     delete_invoice,
     get_draft_invoices,
@@ -42,6 +47,10 @@ from .offers import (
 from .payments import (
     create_payment_request,
     get_available_credit,
+)
+from .stored_value import (
+    get_available_stored_value,
+    get_stored_value_summary,
 )
 from .sales_orders import (
     search_orders,
