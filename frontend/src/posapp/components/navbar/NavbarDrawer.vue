@@ -377,13 +377,7 @@ function closeDrawer() {
 	border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-/* Hide drawer by default, show only when activated */
-.drawer-custom {
-	display: none !important;
-}
-.drawer-custom.drawer-visible {
-	display: block !important;
-}
+/* Removed display overrides that break Vuetify flex layout */
 
 /* Responsive adjustments for width and dark theme */
 @media (max-width: 900px) and (orientation: landscape) {
