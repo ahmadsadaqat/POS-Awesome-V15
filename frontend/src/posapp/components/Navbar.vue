@@ -128,6 +128,8 @@ import { useRtl } from "../composables/core/useRtl";
 
 import { useToastStore } from "../stores/toastStore.js";
 import { useUIStore } from "../stores/uiStore.js";
+import { useEmployeeStore } from "../stores/employeeStore";
+import { useOfflineSyncStore } from "../stores/offlineSyncStore";
 import { storeToRefs } from "pinia";
 
 export default {
