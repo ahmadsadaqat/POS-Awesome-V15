@@ -3,7 +3,7 @@
 		v-model="drawerOpen"
 		:rail="mini"
 		expand-on-hover
-		width="80"
+		width="220"
 		:class="['drawer-custom', { 'drawer-visible': drawerOpen }, rtlClasses]"
 		@mouseleave="handleMouseLeave"
 		temporary
@@ -358,19 +358,19 @@ function closeDrawer() {
 /* Responsive adjustments for width and dark theme */
 @media (max-width: 900px) and (orientation: landscape) {
 	.drawer-custom.drawer-visible {
-		width: 70px !important;
+		width: 180px !important;
 	}
 }
 
 @media (min-width: 601px) and (max-width: 1024px) {
 	.drawer-custom.drawer-visible {
-		width: 70px !important;
+		width: 240px !important;
 	}
 }
 
 @media (min-width: 1025px) {
 	.drawer-custom.drawer-visible {
-		width: 70px !important;
+		width: 300px !important;
 	}
 }
 
