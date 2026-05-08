@@ -71,6 +71,28 @@
 		<div v-if="showSport">
 			<!-- Sport content goes here -->
 		</div>
+
+		<template v-slot:append>
+			<div v-if="footerAction" class="drawer-footer" data-test="drawer-footer-settings">
+				<v-divider class="drawer-footer-divider" />
+				<button
+					type="button"
+					class="drawer-footer-action"
+					data-test="drawer-footer-action"
+					@click="handleFooterActionClick"
+				>
+					<span class="drawer-footer-action__icon">
+						<v-icon color="white">{{ footerAction.icon }}</v-icon>
+					</span>
+					<span v-if="!mini" class="drawer-footer-action__copy">
+						<span class="drawer-footer-action__title">{{ footerAction.text }}</span>
+						<span v-if="footerAction.subtitle" class="drawer-footer-action__subtitle">
+							{{ footerAction.subtitle }}
+						</span>
+					</span>
+				</button>
+			</div>
+		</template>
 	</v-navigation-drawer>
 </template>
 
@@ -98,9 +120,13 @@ const props = defineProps({
 		type: Number,
 		default: 0,
 	},
+	footerAction: {
+		type: Object,
+		default: null,
+	},
 });
 
-const emit = defineEmits(["update:drawer", "update:item", "change-page", "retry-status"]);
+const emit = defineEmits(["update:drawer", "update:item", "change-page", "retry-status", "open-settings"]);
 const { isRtl, rtlClasses } = useRtl();
 
 const mini = ref(false);
