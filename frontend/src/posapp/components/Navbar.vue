@@ -466,6 +466,23 @@ export default {
 		}
 	},
 	methods: {
+		async fetchTerminalEmployees() {
+			const profileName = this.posProfile?.name;
+			if (!profileName) {
+				return;
+			}
+			try {
+				const result = await frappe.call({
+					method: "posawesome.posawesome.api.employees.get_terminal_employees",
+					args: { pos_profile: profileName },
+				});
+				const employees = result?.message || [];
+				this.employeeStore.setTerminalEmployees(employees);
+			} catch (e) {
+				// Non-critical — silently fail; store retains its session default
+				console.warn("[Navbar] fetchTerminalEmployees failed:", e);
+			}
+		},
 		preInitialize() {
 			// Early initialization to prevent cache-related element destruction
 			// Use reactive assignment instead of direct property modification
